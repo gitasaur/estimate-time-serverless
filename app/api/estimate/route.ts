@@ -9,6 +9,18 @@ import { systemPrompt } from './prompt';
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+type Task = {
+  summary: string;
+  discription: string;
+  subtasks?: Task[]
+}
+
+type EstimateRequest = {
+  summary: string;
+  discription: string;
+  parent: Task[];
+}
  
 export async function POST(request: NextRequest) {
   logger.info(request.headers);
@@ -19,45 +31,51 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const task = await request.json();
+  const task = await getTask(request);
+  const completion = await getCompletion(task);
+  logger.info(completion);
 
-  logger.info(task);
+  return NextResponse.json(completion, { status: 200 });
+}
 
-  if (!task) {
-    return NextResponse.json({
-        error: 'No task provided'
-    });
-  }
- 
-  // Ask OpenAI for a streaming completion given the prompt\
-  const completion = await openai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
-    messages: [
-        {
-            role: 'system',
-            content: systemPrompt
-        },
-        {
-            role: 'user',
-            content: JSON.stringify(task)
-        }
-    ]
-  });
-
-  if (!completion?.choices[0]?.message?.content) {
-    return NextResponse.json({
-        error: 'GPT did not respond with a valid estimation.'
-      });
-  }
-
-  logger.info(completion?.choices[0]?.message?.content);
-
+const getTask = async (request: NextRequest) => {
   try {
-    const response = JSON.parse(jsonrepair(completion.choices[0].message.content));
-    return NextResponse.json(response, { status: 200 });
-  } catch (err) {
-    return NextResponse.json({
-      error: 'Issue with JSON format from GPT'
-    }, { status: 500 });
+    const task = await request.json();
+    logger.info(task); 
+    return task;
+  } catch (error) {
+    logger.error(error);
   }
+  throw Error('Input was badly formatted: check request data');
+}
+
+const getCompletion = async (task: EstimateRequest) => {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+          {
+              role: 'system',
+              content: systemPrompt
+          },
+          {
+              role: 'user',
+              content: JSON.stringify(task, null, 2)
+          }
+      ]
+    });
+
+    if (!completion?.choices[0]?.message?.content) {
+      return NextResponse.json({
+          error: 'GPT did not respond with a valid result.'
+        });
+    }
+
+    const response = JSON.parse(jsonrepair(completion.choices[0].message.content));
+    logger.info(response);
+    return response;
+  } catch (error) {
+    logger.error(error);
+  }
+  throw Error('Error getting response from GPT');
 }
