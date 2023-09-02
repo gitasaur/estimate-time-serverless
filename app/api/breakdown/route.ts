@@ -19,13 +19,13 @@ export async function POST(request: NextRequest) {
         });
     }
 
-  const { task } = await request.json();
+    const task = await request.json();
 
-  if (!task) {
-    return NextResponse.json({
-        error: 'No task provided'
-    });
-  }
+    if (!task) {
+      return NextResponse.json({
+          error: 'No task provided'
+      });
+    }
  
   // Ask OpenAI for a streaming completion given the prompt\
   const completion = await openai.chat.completions.create({
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
         },
         {
             role: 'user',
-            content: task
+            content: JSON.stringify(task)
         }
     ]
   });
@@ -48,7 +48,12 @@ export async function POST(request: NextRequest) {
       });
   }
 
-  const breakdown = JSON.parse(completion.choices[0].message.content);
-
-  return NextResponse.json(breakdown);
+  try {
+    const response = JSON.parse(completion.choices[0].message.content);
+    return NextResponse.json(response, { status: 200 });
+  } catch (err) {
+    return NextResponse.json({
+      error: 'Issue with JSON format from GPT'
+    }, { status: 500 });
+  }
 }
