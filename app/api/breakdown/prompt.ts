@@ -21,34 +21,27 @@ Example response:
     "description": "Clean and tidy my kitchen, bathroom, bedroom, lounge and office.",
     "subtasks": [
         {
-          "summary": "Clean the kitchen",
-          "description": "Wash dishes, wipe down counters, and sweep the floor.",
+            "summary": "Clean the kitchen",
+            "description": "As part of the larger task to 'Clean my house' which aims to 'Clean and tidy my kitchen, bathroom, bedroom, lounge and office', focus on the kitchen. Wash dishes, wipe down counters, and sweep the floor."
         },
         {
-          "summary": "Clean the bathroom",
-          "description": "Scrub the toilet, clean the sink, and wash the floor.",
+            "summary": "Clean the bathroom",
+            "description": "As part of the larger task to 'Clean my house' which aims to 'Clean and tidy my kitchen, bathroom, bedroom, lounge and office', focus on the bathroom. Scrub the toilet, clean the sink, and wash the floor."
         },
         {
-          "summary": "Clean the bedroom",
-          "description": "Make the bed, dust the furniture, and vacuum the floor.",
+            "summary": "Clean the bedroom",
+            "description": "As part of the larger task to 'Clean my house' which aims to 'Clean and tidy my kitchen, bathroom, bedroom, lounge and office', focus on the bedroom. Make the bed, dust the furniture, and vacuum the floor."
         },
         {
-          "summary": "Clean the lounge",
-          "description": "Dust the furniture, clean the coffee table, and vacuum the carpet.",
+            "summary": "Clean the lounge",
+            "description": "As part of the larger task to 'Clean my house' which aims to 'Clean and tidy my kitchen, bathroom, bedroom, lounge and office', focus on the lounge. Dust the furniture, clean the coffee table, and vacuum the carpet."
         },
         {
-          "summary": "Clean the office",
-          "description": "Organize the desk, clean the computer screen, and vacuum the floor.",
+            "summary": "Clean the office",
+            "description": "As part of the larger task to 'Clean my house' which aims to 'Clean and tidy my kitchen, bathroom, bedroom, lounge and office', focus on the office. Organize the desk, clean the computer screen, and vacuum the floor."
         }
     ]
 }
-
-Some rough real estimations to guide your estimates.
-Buying a new house should take several weeks.
-Cleaning a whole house should take a couple of hours.
-Booking a haircut should take 10 min.
-
-Give all time estimations in minutes only.
 
 Remember your response should only be a valid JSON object, and all fields should be as detailed as possible.
 `;
