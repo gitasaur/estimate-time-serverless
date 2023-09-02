@@ -5,8 +5,6 @@ import { jsonrepair } from 'jsonrepair';
 
 import { logger } from '../../logger';
 import { systemPrompt } from './prompt';
-
-export const runtime = 'edge';
  
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
