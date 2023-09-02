@@ -13,6 +13,8 @@ const openai = new OpenAI({
 export const runtime = 'edge';
  
 export async function POST(request: NextRequest) {
+  logger.info(request.headers);
+  
   if (request.headers.get('app_api_key') !== process.env.APP_API_KEY) {
     return NextResponse.json({
         error: 'Not authorized'
@@ -21,7 +23,7 @@ export async function POST(request: NextRequest) {
 
   const task = await request.json();
 
-  logger.info(JSON.parse(task));
+  logger.info(task);
 
   if (!task) {
     return NextResponse.json({
