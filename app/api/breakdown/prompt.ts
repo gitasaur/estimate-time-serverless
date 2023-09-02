@@ -10,15 +10,12 @@ Here is an example:
 }
 
 Treat the "description" as a rough and incomplete example which was only jotted down quickly, which may need many more requirements or details.
-You can re-write the discription, adding more details, if it makes sense to do so.
 
-You will also add an array of "subtasks" to the root object which you will complete.
-Each subtask should reference the parent task, as well as the the other subtasks, in the description.
+You will reply with a JSON object add containing an array of "subtasks" to the root object which you will complete.
+Each subtask should reference the original task, as well as the the other subtasks, in the description.
 
 Given the above example, this is an example of how you might reply:
 {
-    "summary": "Clean my house",
-    "description": "Clean and tidy my kitchen, bathroom, bedroom, lounge and office.",
     "subtasks": [
         {
             "summary": "Clean the kitchen",
