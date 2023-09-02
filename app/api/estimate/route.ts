@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const { task } = await request.json();
+  const task = await request.json();
 
   if (!task) {
     return NextResponse.json({
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
         },
         {
             role: 'user',
-            content: task
+            content: JSON.stringify(task)
         }
     ]
   });
@@ -47,10 +47,12 @@ export async function POST(request: NextRequest) {
       });
   }
 
-  const estimation = completion.choices[0].message.content;
-
-  return NextResponse.json({ 
-    task, 
-    estimation
- });
+  try {
+    const response = JSON.parse(completion.choices[0].message.content);
+    return NextResponse.json(response, { status: 200 });
+  } catch (err) {
+    return NextResponse.json({
+      error: 'Issue with JSON format from GPT'
+    }, { status: 500 });
+  }
 }
