@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { jsonrepair } from 'jsonrepair';
 
 import { logger } from '../../logger';
 import { systemPrompt } from './prompt';
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     const task = await request.json();
-    logger.info(JSON.parse(task));
+    logger.info(task);
 
     if (!task) {
       return NextResponse.json({
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
   logger.info(completion?.choices[0]?.message?.content);
 
   try {
-    const response = JSON.parse(completion.choices[0].message.content);
+    const response = JSON.parse(jsonrepair(completion.choices[0].message.content));
     return NextResponse.json(response, { status: 200 });
   } catch (err) {
     return NextResponse.json({

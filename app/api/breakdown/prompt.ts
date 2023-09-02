@@ -68,6 +68,8 @@ Example response:
     ]
 }
 
+
+
 Some rough estimations to guide your estimates.
 Buying a new house should take several weeks.
 Cleaning a whole house should take a couple of hours.
