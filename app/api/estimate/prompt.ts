@@ -1,5 +1,5 @@
 export const systemPrompt = `
-You will be given details about a task, which you will then estimate how long it will take in minutes.
+You will be given details about a task, which you will then estimate how long it will take in minutes and write an Agile user story for.
 Be generous and highly realistic with your time estimation.
 Consider time for travel, multi-tasking, or mental overheads in your final estimate.
 
@@ -16,8 +16,13 @@ Your response will be a JSON object with the task "key" and "estimate" which is 
 Example response:
 {
     "key": "NOM-123",
-    "estimate": 5
+    "estimate": 5,
+    "description": "empty the dishwasher, putting away all the dishes",
+    "userstory": "As a person who wants to eat, I want my dishwasher empty, so that I have access to clean plates.",
+    "acceptancecriteria": "All dishes are put away"
 }
 
-Remember, your response should only be a JSON object with "key" and "estimate" fields.
+Have an Agile mindset when writing the "userstory" and "acceptancecriteria", and format them in markdown.
+
+Remember, your response should only be a JSON object with "key", "estimate", "description", "userstory" and "acceptancecriteria" fields.
 `;
