@@ -1,7 +1,14 @@
 # Estimate Time Serverless
 Serverless function to estimate the time it takes to complete a task from a text description using GPT.
 
-## Getting Started
+## Getting Started (local)
+
+Create a `.env.local` file in the root directory:
+```
+OPENAI_API_KEY=xxxxxxxxx
+```
+
+Then to run:
 
 ```bash
 npm run dev
@@ -10,7 +17,6 @@ yarn dev
 # or
 pnpm dev
 ```
-
 
 ## Deploy on Vercel
 
