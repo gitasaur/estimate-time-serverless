@@ -5,57 +5,83 @@ import { jsonrepair } from 'jsonrepair';
 
 import { logger } from '../../logger';
 import { systemPrompt } from './prompt';
- 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
- 
-export async function POST(request: NextRequest) {
-    logger.info(request.headers);
 
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+
+type Task = {
+    summary: string;
+    discription: string;
+    subtasks?: Task[]
+}
+
+type EstimateRequest = {
+    summary: string;
+    discription: string;
+    parent: Task[];
+}
+
+export async function POST(request: NextRequest) {
     if (request.headers.get('app_api_key') !== process.env.APP_API_KEY) {
         return NextResponse.json({
             error: 'Not authorized'
         });
     }
 
-    const task = await request.json();
-    logger.info(task);
+    const task = await getTask(request);
 
     if (!task) {
-      return NextResponse.json({
-          error: 'No task provided'
-      });
+        return NextResponse.json({
+            error: 'No task provided'
+        });
     }
- 
-  const completion = await openai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
-    messages: [
-        {
-            role: 'system',
-            content: systemPrompt
-        },
-        {
-            role: 'user',
-            content: JSON.stringify(task)
+
+    const completion = await getCompletion(task);
+    logger.info(completion);
+  
+    return NextResponse.json(completion, { status: 200 });
+}
+
+const getTask = async (request: NextRequest) => {
+    try {
+        const text = await request.text();
+        return JSON.parse(jsonrepair(text));
+    } catch (error) {
+        logger.error(error);
+    }
+    throw Error('Input was badly formatted: check request data');
+}
+
+const getCompletion = async (task: EstimateRequest) => {
+    try {
+        const completion = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {
+                    role: 'system',
+                    content: systemPrompt
+                },
+                {
+                    role: 'user',
+                    content: JSON.stringify(task, null, 2)
+                }
+            ]
+        });
+
+        if (!completion?.choices[0]?.message?.content) {
+            return NextResponse.json({
+                error: 'GPT did not respond with a valid result.'
+            });
         }
-    ]
-  });
 
-  if (!completion?.choices[0]?.message?.content) {
-    return NextResponse.json({
-        error: 'GPT did not respond with a valid estimation.'
-      });
-  }
+        console.log(completion?.choices[0]?.message?.content);
 
-  const response = JSON.parse(jsonrepair(completion.choices[0].message.content));
-  logger.info(response);
-
-  try {
-    return NextResponse.json(response, { status: 200 });
-  } catch (err) {
-    return NextResponse.json({
-      error: 'Issue with JSON format from GPT'
-    }, { status: 500 });
-  }
+        const response = JSON.parse(jsonrepair(completion.choices[0].message.content));
+        logger.info(response);
+        return response;
+    } catch (error) {
+        logger.error(error);
+    }
+    throw Error('Error getting response from GPT');
 }

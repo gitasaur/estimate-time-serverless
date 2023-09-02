@@ -5,7 +5,7 @@ import { jsonrepair } from 'jsonrepair';
 
 import { logger } from '../../logger';
 import { systemPrompt } from './prompt';
- 
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -21,17 +21,24 @@ type EstimateRequest = {
   discription: string;
   parent: Task[];
 }
- 
+
 export async function POST(request: NextRequest) {
   logger.info(request.headers);
 
   if (request.headers.get('app_api_key') !== process.env.APP_API_KEY) {
     return NextResponse.json({
-        error: 'Not authorized'
+      error: 'Not authorized'
     });
   }
 
   const task = await getTask(request);
+
+  if (!task) {
+    return NextResponse.json({
+      error: 'No task provided'
+    });
+  }
+  
   const completion = await getCompletion(task);
   logger.info(completion);
 
@@ -40,8 +47,9 @@ export async function POST(request: NextRequest) {
 
 const getTask = async (request: NextRequest) => {
   try {
-    const task = await request.json();
-    logger.info(task); 
+    const text = await request.text();
+    const task = JSON.parse(jsonrepair(text));
+    logger.info(task);
     return task;
   } catch (error) {
     logger.error(error);
@@ -54,21 +62,21 @@ const getCompletion = async (task: EstimateRequest) => {
     const completion = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
-          {
-              role: 'system',
-              content: systemPrompt
-          },
-          {
-              role: 'user',
-              content: JSON.stringify(task, null, 2)
-          }
+        {
+          role: 'system',
+          content: systemPrompt
+        },
+        {
+          role: 'user',
+          content: JSON.stringify(task, null, 2)
+        }
       ]
     });
 
     if (!completion?.choices[0]?.message?.content) {
       return NextResponse.json({
-          error: 'GPT did not respond with a valid result.'
-        });
+        error: 'GPT did not respond with a valid result.'
+      });
     }
 
     const response = JSON.parse(jsonrepair(completion.choices[0].message.content));
