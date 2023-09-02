@@ -1,7 +1,9 @@
 import OpenAI from 'openai';
-import { NextResponse } from 'next/server';
+import {  } from 'next/server';
+import { NextResponse, NextMiddleware } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+import { logger } from '../../logger';
 import { systemPrompt } from './prompt';
  
 const openai = new OpenAI({
@@ -18,6 +20,8 @@ export async function POST(request: NextRequest) {
   }
 
   const task = await request.json();
+  
+  logger.info(JSON.parse(task));
 
   if (!task) {
     return NextResponse.json({
@@ -46,8 +50,11 @@ export async function POST(request: NextRequest) {
       });
   }
 
+  logger.info(completion?.choices[0]?.message?.content);
+
   try {
     const response = JSON.parse(completion.choices[0].message.content);
+    console.log(response);
     return NextResponse.json(response, { status: 200 });
   } catch (err) {
     return NextResponse.json({

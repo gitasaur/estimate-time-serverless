@@ -2,6 +2,7 @@ import OpenAI from 'openai';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+import { logger } from '../../logger';
 import { systemPrompt } from './prompt';
  
 // Create an OpenAI API client (that's edge friendly!)
@@ -20,6 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     const task = await request.json();
+    logger.info(JSON.parse(task));
 
     if (!task) {
       return NextResponse.json({
@@ -47,6 +49,8 @@ export async function POST(request: NextRequest) {
         error: 'GPT did not respond with a valid estimation.'
       });
   }
+
+  logger.info(completion?.choices[0]?.message?.content);
 
   try {
     const response = JSON.parse(completion.choices[0].message.content);
