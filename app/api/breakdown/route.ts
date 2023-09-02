@@ -1,22 +1,23 @@
 import OpenAI from 'openai';
-import { OpenAIStream, StreamingTextResponse,  } from 'ai';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 import { systemPrompt } from './prompt';
  
+// Create an OpenAI API client (that's edge friendly!)
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
  
+// Set the runtime to edge for best performance
 export const runtime = 'edge';
  
 export async function POST(request: NextRequest) {
-  if (request.headers.get('app_api_key') !== process.env.APP_API_KEY) {
-    return NextResponse.json({
-        error: 'Not authorized'
-    });
-  }
+    if (request.headers.get('app_api_key') !== process.env.APP_API_KEY) {
+        return NextResponse.json({
+            error: 'Not authorized'
+        });
+    }
 
   const { task } = await request.json();
 
@@ -47,10 +48,7 @@ export async function POST(request: NextRequest) {
       });
   }
 
-  const estimation = completion.choices[0].message.content;
+  const breakdown = JSON.parse(completion.choices[0].message.content);
 
-  return NextResponse.json({ 
-    task, 
-    estimation
- });
+  return NextResponse.json(breakdown);
 }
