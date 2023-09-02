@@ -6,13 +6,9 @@ import { jsonrepair } from 'jsonrepair';
 import { logger } from '../../logger';
 import { systemPrompt } from './prompt';
  
-// Create an OpenAI API client (that's edge friendly!)
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
- 
-// // Set the runtime to edge for best performance
-// export const runtime = 'edge';
  
 export async function POST(request: NextRequest) {
     logger.info(request.headers);
@@ -32,7 +28,6 @@ export async function POST(request: NextRequest) {
       });
     }
  
-  // Ask OpenAI for a streaming completion given the prompt\
   const completion = await openai.chat.completions.create({
     model: 'gpt-3.5-turbo',
     messages: [
@@ -53,10 +48,10 @@ export async function POST(request: NextRequest) {
       });
   }
 
-  logger.info(completion?.choices[0]?.message?.content);
+  const response = JSON.parse(jsonrepair(completion.choices[0].message.content));
+  logger.info(response);
 
   try {
-    const response = JSON.parse(jsonrepair(completion.choices[0].message.content));
     return NextResponse.json(response, { status: 200 });
   } catch (err) {
     return NextResponse.json({

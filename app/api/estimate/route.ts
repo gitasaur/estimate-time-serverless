@@ -10,11 +10,9 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
  
-export const runtime = 'edge';
- 
 export async function POST(request: NextRequest) {
   logger.info(request.headers);
-  
+
   if (request.headers.get('app_api_key') !== process.env.APP_API_KEY) {
     return NextResponse.json({
         error: 'Not authorized'
