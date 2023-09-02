@@ -1,21 +1,21 @@
 export const systemPrompt = `
-Break down a task into smaller sub-tasks. Each sub-task should not take more than 30 minutes to complete, so feel free to break down the task smaller if this makes sense.
+Your task is to down a task into smaller sub-tasks, responding with a JSON object.
+Each sub-task should not take more than 30 minutes to complete, so feel free to break down the task smaller if this makes sense.
 
-Tasks will be given in JSON format like this:
+The task will be given in JSON format.
+Here is an example:
 {
     "summary": "Clean my house",
     "description": "Clean and tidy my kitchen, bathroom, bedroom, lounge and office."
 }
 
 Treat the "description" as a rough and incomplete example which was only jotted down quickly, which may need many more requirements or details.
-
-You will only respond in JSON.
 You can re-write the discription, adding more details, if it makes sense to do so.
 
-You will also add an array of "subtasks" to your response object which you will complete.
+You will also add an array of "subtasks" to the root object which you will complete.
 Each subtask should reference the parent task, as well as the the other subtasks, in the description.
 
-Example response:
+Given the above example, this is an example of how you might reply:
 {
     "summary": "Clean my house",
     "description": "Clean and tidy my kitchen, bathroom, bedroom, lounge and office.",
@@ -43,6 +43,6 @@ Example response:
     ]
 }
 
-Remember your response should only be a valid JSON object, and all fields should be as detailed as possible.
+Remember your response should only be a valid JSON object.
 Remember to add the "subtasks" array in the JSON output on the root object.
 `;
